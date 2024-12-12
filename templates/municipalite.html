@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau{% endblock %}
+
+{% block content %}
+
+<style>
+    html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .container-fluid, .row {
+        width: 100%;
+        padding-right: 0;
+        padding-left: 0;
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .embed-responsive {
+        position: relative;
+        display: block;
+        width:100%;
+        padding: 0;
+        overflow: hidden;
+        /* Définir une hauteur fixe ou relative à la hauteur de la fenêtre */
+        height: 100%; /* cela définit la hauteur à 50% de la hauteur de la fenêtre d'affichage */
+    }
+    .embed-responsive::before {
+        display: block;
+        content: "";
+    }
+    .embed-responsive-16by9::before {
+        padding-top: 56.25%;
+    }
+    .embed-responsive-item {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    .custom-section {
+    background-color: white;
+    color: black;
+    padding: 15px; /* Augmente le padding pour un meilleur espacement */
+    margin-bottom: 0; /* Espace en dessous du div */
+    margin-left: auto;
+    margin-right: auto ;
+
+    }
+
+    .custom-section-second {
+    background-color: #f8f9fa; /* Gris plus foncé pour le deuxième div */
+    }
+
+    .custom-section-copyrigth p {
+        text-align: center;
+    }
+
+    .custom-section-copyrigth {
+        background-color:#FFFF66; /* Gris plus foncé pour le deuxième div */
+    }
+
+    .custom-section p, .custom-section ul {
+        text-align: center; /* Alignement du texte à gauche pour les paragraphes et listes */
+        margin-left: 20px; /* Ajoute un peu de marge à gauche pour aligner le texte sous les titres */
+    }
+
+    .custom-section ul {
+        list-style-type: disc; /* Style de puce pour la liste */
+        padding-left: 20px; /* Espace à gauche pour l'indentation des puces */
+    }
+    .custom-section h1 {
+        text-align: center; /* Centre les titres h1 et h2 */
+        font-weight: bold;
+    }
+
+    .custom-section h2 {
+        font-weight: bold;
+    }
+
+
+    .table-responsive {
+    overflow-x: auto; /* Permet le défilement horizontal */
+    max-width: 100%; /* Limite la largeur maximale pour éviter l'expansion hors de la vue */
+    }
+
+    .debut_municipalite {
+     /* background-color: #f4511e; */
+    color: #ffffff;
+    padding: 25px;
+    /* background: 2px rgba(0, 0, 0, 0.9); */
+    filter: grayscale(0%);
+    background-image: url('https://espacestrategies.com/wp/wp-content/uploads/2023/02/DIO016_photositeweb15-2560x800.jpg'); /* Remplacez 'path_to_your_image.jpg' par le chemin vers votre image de flotte d'municipalite */
+    background-size: cover;
+    background-position: center;
+    text-shadow: 2px 2px 8px rgba(0,0,0,1); /* Ajoute une ombre au texte pour améliorer la lisibilité sur des images claires */
+    }
+
+    .debut_municipalite h1 {
+    padding: 25px;
+    font-size: 50px;
+    font-weight: bold;
+    }
+
+    .debut_municipalite p {
+    padding: 25px;
+    font-size: 25px;
+    font-weight: bold;
+    }
+
+    .charger_municipalite {
+    padding: 15px;
+    }
+
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,.05);
+    }
+    .table {
+        width: 100%; /* Assurez-vous que la table utilise toute la largeur disponible */
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+    th, td {
+        text-align: center; /* Centre le texte dans les cellules */
+        vertical-align: middle; /* Alignement vertical pour que le texte soit centré dans les cellules */
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,.05); /* Ajoute un fond zébré pour les lignes impaires */
+    }
+</style>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+        $('#myTable').DataTable({
+            "scrollX": true
+        });
+    });
+</script>
+
+<div class="debut_municipalite text-center">
+    <h1>Calculateur d'optimisation de l'énergie pour ville ou municipalité</h1>
+    <p>Obtenez un calcul rapide de l'optimisation de l'énergie d'une flotte de véhicules pour ville ou municipalite en partant d'une description de données jusqu'à l'optimisation du tarif</p>
+    <form action="/municipalite" method="post" enctype="multipart/form-data">
+        <select name="fileType">
+            <option value="filePeriode">Période</option>
+            <option value="fileAppel">Appel de Puissance</option>
+            <option value="fileFlotte">Flotte</option>
+        </select>
+    <div class="container"> 
+        <input type="file" class="form-control" name="file" required>
+        <button type="submit" class="btn btn-primary">Charger</button>
+    </div>    
+    </form>
+</div>
+
+<div class="custom-section container">
+    {% if stats %}
+    <div class="resultats">
+        <h2>Statistiques descriptives</h2>
+        <div>{{ stats|safe }}</div>
+    </div>
+    {% endif %}
+
+    {% if plot_url %}
+    <div class="graphique">
+        <h2>Heatmap des données numériques</h2>
+        <img src="data:image/png;base64,{{ plot_url }}" alt="Heatmap">
+    </div>
+    {% endif %}
+    {% if plot_url2 %}
+    <div class="graphique">
+        <h2>Profil de Puissance</h2>
+        <img src="data:image/png;base64,{{ plot_url2 }}" alt="Profil de Puissance">
+    </div>
+    {% endif %}
+    {% if plot_url3 %}
+    <div class="graphique">
+        <h2>Heures de Pointe</h2>
+        <img src="data:image/png;base64,{{ plot_url3 }}" alt="Heures de Pointe">
+    </div>
+    {% endif %}
+    {% if plot_url4 %}
+    <div class="graphique">
+        <h2>Heatmap des données de l'appel de puissance</h2>
+        <img src="data:image/png;base64,{{ plot_url4 }}" alt="Heatmap de l'appel de puissance">
+    </div>
+    {% endif %}
+    {% if plot_url5 %}
+    <div class="graphique">
+        <h2>Appel de Puissance</h2>
+        <img src="data:image/png;base64,{{ plot_url5 }}" alt="Appel de Puissance">
+    </div>
+    {% endif %}
+
+    {% if results_html_ap %}
+    <div class="resultats">
+        <h2>Tableau appel de puissance </h2>
+        <div>{{ results_html_ap|safe }}</div>
+    </div>
+    {% endif %}
+
+    {% if plot_url6 %}
+    <div class="graphique">
+        <h2>Boîte à moustache des heures de pointe</h2>
+        <img src="data:image/png;base64,{{ plot_url6 }}" alt="Boîte à moustache">
+    </div>
+    {% endif %}
+    {% if stats2 %}
+    <div class="resultats">
+        <h2>Statistiques descriptives</h2>
+        <div>{{ stats2|safe }}</div>
+    </div>
+    {% endif %}
+
+    {% if carbone %}
+    <div class="resultats">
+        <h2>Crédit carbone </h2>
+        <div>{{ carbone|safe }}</div>
+    </div>
+    {% endif %}
+
+    {% if stats3 %}
+        <h2 class="mt-5">Consommation énergétique et puissance de bornes</h2>
+        <div>{{ stats3|safe }}</div>
+    {% endif %}
+
+    {% if results_tarif_html %}
+    <h2 class="mt-5">Coûts tarifaires sans contrôle de puissance</h2>
+    <div>{{ results_tarif_html|safe }}</div>
+    {% endif %}
+
+
+    {% if plot_url7 %}
+    <div class="graphique">
+        <h2>Coûts énergétiques annuels sans contrôle de puissance</h2>
+        <img src="data:image/png;base64,{{ plot_url7 }}" alt="Plot tarif">
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock %}
